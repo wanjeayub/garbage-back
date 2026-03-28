@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./src/config/db");
+const path = require("path");
 
 // Load env vars
 dotenv.config();
@@ -10,6 +11,9 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+// use var to prevent future bugs on render
+var __dirname = path.resolve();
 
 // Middleware
 app.use(cors());
@@ -24,7 +28,13 @@ app.use("/api/admins", require("./src/routes/admins"));
 
 // Default route
 app.get("/", (req, res) => {
-  res.json({ msg: "Welcome to the Garbage Collection API!" });
+  res.status(200).json({ msg: "Welcome to the Garbage Collection API!" });
+});
+
+app.use(express.static(path.join(__dirname, "/client/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
 });
 
 // Error handling middleware
